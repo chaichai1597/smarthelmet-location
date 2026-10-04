@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0">
+
+<title>Smart Helmet GPS</title>
+
+<style>
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+
+    margin: 0;
+
+    font-family:
+        Arial,
+        "Noto Sans Thai",
+        sans-serif;
+
+    background:
+        linear-gradient(
+            135deg,
+            #e3f2fd,
+            #ffffff
+        );
+
+    min-height: 100vh;
+
+    display: flex;
+
+    justify-content: center;
+
+    align-items: center;
+
+    padding: 20px;
+}
+
+.container {
+
+    width: 100%;
+
+    max-width: 450px;
+
+    background: white;
+
+    border-radius: 25px;
+
+    padding: 30px;
+
+    box-shadow:
+        0 10px 30px
+        rgba(0,0,0,0.15);
+
+    text-align: center;
+}
+
+.logo {
+
+    font-size: 60px;
+
+    margin-bottom: 10px;
+}
+
+h1 {
+
+    margin: 0;
+
+    color: #1565c0;
+
+}
+
+.subtitle {
+
+    color: #666;
+
+    margin-bottom: 25px;
+}
+
+button {
+
+    width: 100%;
+
+    padding: 16px;
+
+    border: none;
+
+    border-radius: 15px;
+
+    background: #1976d2;
+
+    color: white;
+
+    font-size: 18px;
+
+    font-weight: bold;
+
+    cursor: pointer;
+}
+
+button:active {
+
+    transform: scale(0.98);
+
+}
+
+#status {
+
+    margin-top: 20px;
+
+    font-weight: bold;
+
+}
+
+.location-box {
+
+    margin-top: 20px;
+
+    background: #f1f8e9;
+
+    padding: 20px;
+
+    border-radius: 15px;
+
+    text-align: left;
+
+    display: none;
+}
+
+.location-box p {
+
+    margin: 10px 0;
+
+}
+
+.value {
+
+    font-size: 18px;
+
+    font-weight: bold;
+
+    color: #1565c0;
+
+    word-break: break-all;
+}
+
+.map-button {
+
+    display: block;
+
+    margin-top: 15px;
+
+    padding: 14px;
+
+    background: #43a047;
+
+    color: white;
+
+    text-decoration: none;
+
+    text-align: center;
+
+    border-radius: 12px;
+
+    font-weight: bold;
+}
+
+.error {
+
+    color: #d32f2f;
+
+    background: #ffebee;
+
+    padding: 15px;
+
+    border-radius: 12px;
+
+    margin-top: 15px;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="logo">
+        🪖
+    </div>
+
+    <h1>
+        Smart Helmet
+    </h1>
+
+    <div class="subtitle">
+        ระบบ GPS สำรองจากโทรศัพท์
+    </div>
+
+    <button onclick="getLocation()">
+        📍 ขอ Location ปัจจุบัน
+    </button>
+
+    <div id="status"></div>
+
+    <div
+        id="locationBox"
+        class="location-box"
+    >
+
+        <p>
+            📍 Latitude
+        </p>
+
+        <div
+            id="latitude"
+            class="value"
+        >
+        </div>
+
+
+        <p>
+            📍 Longitude
+        </p>
+
+        <div
+            id="longitude"
+            class="value"
+        >
+        </div>
+
+
+        <p>
+            🎯 ความแม่นยำ
+        </p>
+
+        <div
+            id="accuracy"
+            class="value"
+        >
+        </div>
+
+
+        <a
+            id="mapLink"
+            class="map-button"
+            target="_blank"
+        >
+            🗺️ เปิด Google Maps
+        </a>
+
+    </div>
+
+</div>
+
+
+<script>
+
+function getLocation() {
+
+    const status =
+        document.getElementById("status");
+
+    const box =
+        document.getElementById("locationBox");
+
+
+    box.style.display = "none";
+
+
+    status.innerHTML =
+        "⏳ กำลังค้นหาตำแหน่ง...";
+
+
+    if (!navigator.geolocation) {
+
+        status.innerHTML = `
+            <div class="error">
+                ❌ อุปกรณ์นี้ไม่รองรับ GPS
+            </div>
+        `;
+
+        return;
+    }
+
+
+    navigator.geolocation.getCurrentPosition(
+
+        function(position) {
+
+            const latitude =
+                position.coords.latitude;
+
+            const longitude =
+                position.coords.longitude;
+
+            const accuracy =
+                position.coords.accuracy;
+
+
+            document.getElementById(
+                "latitude"
+            ).innerText =
+                latitude.toFixed(6);
+
+
+            document.getElementById(
+                "longitude"
+            ).innerText =
+                longitude.toFixed(6);
+
+
+            document.getElementById(
+                "accuracy"
+            ).innerText =
+                "ประมาณ "
+                + accuracy.toFixed(1)
+                + " เมตร";
+
+
+            const mapURL =
+                "https://www.google.com/maps?q="
+                + latitude
+                + ","
+                + longitude;
+
+
+            document.getElementById(
+                "mapLink"
+            ).href = mapURL;
+
+
+            box.style.display =
+                "block";
+
+
+            status.innerHTML =
+                "✅ พบตำแหน่งแล้ว";
+
+        },
+
+
+        function(error) {
+
+            let message = "";
+
+
+            if (error.code === 1) {
+
+                message =
+                    "กรุณาอนุญาตให้เว็บไซต์ใช้ Location";
+
+            }
+
+            else if (error.code === 2) {
+
+                message =
+                    "โทรศัพท์ไม่สามารถหาตำแหน่งได้";
+
+            }
+
+            else if (error.code === 3) {
+
+                message =
+                    "ค้นหาตำแหน่งใช้เวลานานเกินไป";
+
+            }
+
+            else {
+
+                message =
+                    "เกิดข้อผิดพลาดในการค้นหา Location";
+
+            }
+
+
+            status.innerHTML = `
+
+                <div class="error">
+                    ❌ ${message}
+                </div>
+
+            `;
+
+        },
+
+
+        {
+
+            enableHighAccuracy: true,
+
+            timeout: 20000,
+
+            maximumAge: 0
+
+        }
+
+    );
+
+}
+
+</script>
+
+</body>
+
+</html>
